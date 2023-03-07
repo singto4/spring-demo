@@ -10,24 +10,23 @@ pipeline {
       	docker {
         	image 'maven:3.5.0'
         }
-      }
-      stage("Pull Code From Master Branch") {
-        git branch: "$git_branch", url: "$git_url"
-      }
-      stage("Build Jar") {
-      	sh 'mvn clean package'
-      }
     }
-
+    stage("Pull Code From Master Branch") {
+      git branch: "$git_branch", url: "$git_url"
+    }
+    stage("Build Jar") {
+      sh 'mvn clean package'
+    }
+ 
     stage("Build image") {
       steps {
         script {
-          container("docker") {
-            sh "docker -v"
-            sh "docker build -t ${project_name}:jenkins_build -t ${project_name}:jenkins_build_latest ."
+              container("docker") {
+                sh "docker -v"
+                sh "docker build -t ${project_name}:jenkins_build -t ${project_name}:jenkins_build_latest ."
+              }
+            }
           }
         }
       }
-    }
-  }
 }
