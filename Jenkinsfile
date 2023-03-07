@@ -3,31 +3,39 @@ def git_url = "https://github.com/singto4/spring-demo.git"
 def project_name = "demo"
 
 pipeline {
-  agent {
-      docker {
-          image 'maven:3.9.0-eclipse-temurin-11' 
-          args '-v /root/.m2:/root/.m2' 
-      }
-  }
+  agent "docker"
   stages {
-    stage("mvn") {
-      steps("Pull Code From Master Branch") {
-        git branch: "$git_branch", url: "$git_url"
-      }
-      steps("Build Jar") {
-        sh 'mvn clean package'
+    stage("Prepare configuration") {
+      steps {
+        script {
+          container("maven") {
+            stage("Update Custom Maven Lib") {
+              git branch: "$git_branch_lib", credentialsId: "$git_credentials_id", url: "https://github.com/corp-ais/ebiz-microservice-lib.git"
+              sh "mvn clean install -Dmaven.test.skip"
+              cleanWs()
+            }
+            stage("Pull Code From Master Branch") {
+              git branch: "$git_branch", credentialsId: "$git_credentials_id", url: "$git_url"
+            }
+            stage("Build Jar") {
+              sh "mvn clean package -am -pl billing-detail -Dmaven.test.skip"
+            }
+          }
+        }
       }
     }
- 
+
     stage("Build image") {
       steps {
         script {
-              container("docker") {
-                sh "docker -v"
-                sh "docker build -t ${project_name}:jenkins_build -t ${project_name}:jenkins_build_latest ."
-              }
+          container("docker") {
+            sh "docker -v"
+            sh "docker build -t ${project_name}:jenkins_build -t ${project_name}:jenkins_build_latest ."
+          }
         }
       }
-    } 
+    }
+
+    }
   }
 }
