@@ -2,6 +2,7 @@ def git_branch = "master"
 def git_url = "https://github.com/singto4/spring-demo.git"
 def project_name = "demo"
 
+#!groovy
 pipeline {
   agent none
   stages {
