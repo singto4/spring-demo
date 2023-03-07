@@ -10,7 +10,7 @@ pipeline {
     stage("Prepare configuration") {
       steps {
         script {
-          container("maven") {
+
             stage("Update Custom Maven Lib") {
               git branch: "$git_branch_lib", credentialsId: "$git_credentials_id", url: "https://github.com/corp-ais/ebiz-microservice-lib.git"
               sh "mvn clean install -Dmaven.test.skip"
@@ -22,7 +22,7 @@ pipeline {
             stage("Build Jar") {
               sh "mvn clean package -am -pl billing-detail -Dmaven.test.skip"
             }
-          }
+          
         }
       }
     }
