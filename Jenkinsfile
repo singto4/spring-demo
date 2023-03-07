@@ -2,23 +2,22 @@ def git_branch = "master"
 def git_url = "https://github.com/singto4/spring-demo.git"
 def project_name = "demo"
 
-#!groovy
 pipeline {
-  agent none
+  agent {
+      docker {
+          image 'maven:3.9.0-eclipse-temurin-11' 
+          args '-v /root/.m2:/root/.m2' 
+      }
+  }
   stages {
-  	stage('Maven Install') {
-    	agent {
-      	docker {
-        	image 'maven:3.5.0'
-        }
-   
+    stage("mvn") {
       steps("Pull Code From Master Branch") {
         git branch: "$git_branch", url: "$git_url"
       }
       steps("Build Jar") {
         sh 'mvn clean package'
       }
-    
+    }
  
     stage("Build image") {
       steps {
