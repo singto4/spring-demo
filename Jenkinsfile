@@ -3,11 +3,12 @@ def git_url = "https://github.com/singto4/spring-demo.git"
 def project_name = "demo"
 
 pipeline {
-  agent {
-    docker { image 'maven:3.6.3-jdk-8' }
-  }
+  agent any
   stages {
     stage("Prepare configuration") {
+      agent {
+          docker { image 'maven:3.6.3-jdk-8' }
+      }
       steps {
         script {
 
